@@ -2,4 +2,7 @@
 tsc --module commonjs server.ts
 
 # run server
-node server.js
+# node server.js
+
+# run test
+npm test

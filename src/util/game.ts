@@ -2,12 +2,24 @@
 
 'use strict';
 
-import CardModule = require('./card');
-// let Card = Card.Card;
+import card = require('./card');
+import deck = require('./deck');
+import player = require('./player');
 
-export class Game {
-	c1: CardModule.Card;
-	constructor() {
-		this.c1 = new CardModule.Card(CardModule.CardSuit.SPADE, CardModule.CardVal.ACE);
+export module gameModule {
+
+	export interface Board {
+		flop: card.CardModule.Card[];
+		turn: card.CardModule.Card[];
+		river: card.CardModule.Card[];
+	}
+
+	export class Game {
+		players: player.PlayerModule.Player[];
+		board: Board = { 'flop': [], 'turn': [], 'river': []};
+		deck: deck.DeckModule.Deck;
+		constructor() {
+			
+		}
 	}
 }

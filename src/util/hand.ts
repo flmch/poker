@@ -1,10 +1,10 @@
 /// <reference path="./util.d.ts" />
 
-import CardModule = require('./card');
+import card = require('./card');
 
 export class Hand {
-	card1: CardModule.Card;
-	card2: CardModule.Card;
+	card1: card.CardModule.Card;
+	card2: card.CardModule.Card;
 	constructor() {
 		
 	}

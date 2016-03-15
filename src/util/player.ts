@@ -1,15 +1,21 @@
 /// <reference path="./util.d.ts" />
 
-import CardModule = require('./card');
-import DeckModule = require('./deck');
+import card = require('./card');
+import deck = require('./deck');
 
-export class Player {
-	name: string;
-	hand: CardModule.Card[];
-	constructor() {
+export module PlayerModule {
+	// export interface Hand {
+	// 	card1: card.CardModule.Card;
+	// 	card2: card.CardModule.Card;
+	// }
+	export class Player {
+		name: string;
+		hand: card.CardModule.Card[];
+		constructor() {
 
-	}
-	getHand(hand: CardModule.Card[]) {
-		this.hand = hand;
-	}
+		}
+		getHand(hand: card.CardModule.Card[]) {
+			this.hand = hand;
+		}
+	}	
 }

@@ -9,7 +9,7 @@ import card = require('./src/util/card');
 let app = express();
 let PORT = process.env.PORT || 3000;
 
-let myDeck = new card.Deck();
+// let myDeck = new card.Deck();
 // console.log(card);
 
 app.use(express.static(__dirname+'/public'));
