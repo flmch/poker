@@ -1,3 +1,4 @@
 node_modules/
 src/typings
 src/util/*.js
+server.js

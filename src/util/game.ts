@@ -1,9 +1,10 @@
 /// <reference path="./util.d.ts" />
 
+'use strict';
+
 import CardModule = require('./card');
 // let Card = Card.Card;
 
-'use strict';
 export class Game {
 	c1: CardModule.Card;
 	constructor() {
