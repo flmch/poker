@@ -1,10 +1,16 @@
 /// <reference path='./src/typings/tsd.d.ts' />
+/// <reference path="./src/util/util.d.ts" />
 
 import express = require('express');
 import bodyParser = require('body-parser');
+import game = require('./src/util/game');
+import card = require('./src/util/card');
 
 let app = express();
 let PORT = process.env.PORT || 3000;
+
+let myDeck = new card.Deck();
+// console.log(card);
 
 app.use(express.static(__dirname+'/public'));
 // app.use(bodyParser.urlencoded())
