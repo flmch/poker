@@ -36,8 +36,6 @@ describe('rank', function(){
 		var sortCard = RankModule.sortCard;
 		var original = [ 'S, A', 'S, T', 'S, 2', 'S, K', 'S, 5', 'S, 7', 'S, 8' ];
 		var sorted = [ 'S, A', 'S, K', 'S, T', 'S, 8', 'S, 7', 'S, 5', 'S, 2' ];
-		console.log(toCardArr(original));
-		console.log(toCardArr(sorted));
 		expect(  JSON.stringify(sortCard(toCardArr(original))) ).toBe( JSON.stringify(toCardArr(sorted)) );
 
 		// original = [
