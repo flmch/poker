@@ -1,6 +1,6 @@
 
-var testCard = require('../../src/util/card');
-var testRank = require('../../src/util/rank');
+var testCard = require('../../src/utiljs/card');
+var testRank = require('../../src/utiljs/rank');
 
 describe('card', function(){
 	it('should return correct card based on input string', function(){

@@ -12,6 +12,8 @@ var concat        = require('gulp-concat');
 var tsc 		  		= require('gulp-typescript');
 var nodemon 			= require('gulp-nodemon');
 var browserSync   = require('browser-sync');
+var Server        = require('karma').Server;
+
 
 // ********************* CONFIG *******************************
 
@@ -19,11 +21,12 @@ var browserSync   = require('browser-sync');
 // to compile the whole libarary, use empty string ''
 // define input and output path
 var src = {
-	'script'  : './src/js/**/*.ts',
-	'scriptNM': './src/js/**/*.!(module).ts',
-	'scriptM' : './src/js/**/*.module.ts',
-	'style'   : './src/css/**/*.scss',
-	'html'		: './public/**/*.html'
+	module
+	// 'script'  : './src/js/**/*.ts',
+	// 'scriptNM': './src/js/**/*.!(module).ts',
+	// 'scriptM' : './src/js/**/*.module.ts',
+	// 'style'   : './src/css/**/*.scss',
+	// 'html'		: './public/**/*.html'
 	// 'template' : './public/template/*'
 }
 
@@ -37,7 +40,8 @@ var fileNameMin = 'kmk.min.js';
 
 // ********************** MAIN TASK ************************
 
-gulp.task('default',['ts-lint','build-js', 'build-css', 'browser-sync', 'watch']);
+gulp.task('default',['ts-module', 'test', 'watch']);
+// gulp.task('default',['ts-lint','build-js', 'build-css', 'browser-sync', 'watch']);
 
 // ********************** CHECK ************************
 
@@ -50,12 +54,32 @@ gulp.task('ts-lint',function(){
 
 // watch file change and keep checking
 gulp.task('watch',function(){
-	gulp.watch(src.script, ['ts-lint', 'build-js']);
-	gulp.watch(src.style,['build-css']);
-	gulp.watch([src.html], function(){
-		browserSync.reload();
-	});
+	// gulp.watch(src.script, ['ts-lint', 'build-js']);
+	// gulp.watch(src.style,['build-css']);
+	// gulp.watch([src.html], function(){
+	// 	browserSync.reload();
+	// });
+	gulp.watch(['./src/util/*.ts'], ['ts-module']);
 })
+
+// ********************** TS *******************************
+
+gulp.task('ts-module', function(){
+	return gulp.src(['./src/util/*.ts'])
+		.pipe(tsc({
+      module: "CommonJS",
+      sourcemap: true			
+		}))
+		.pipe(gulp.dest('./src/utiljs'));
+});
+
+// ********************** Karma *******************************
+
+gulp.task('test', function (done) {
+  new Server({
+    configFile: __dirname + '/karma.conf.js'
+  }, done).start();
+});
 
 // ********************** JS *******************************
 

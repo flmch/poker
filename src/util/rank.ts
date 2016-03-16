@@ -4,6 +4,9 @@ import card = require('./card');
 import player = require('./player');
 import game = require('./game');
 
+let cardValStrength = card.CardModule.cardValStrength;
+let straightList = card.CardModule.straightList;
+
 export module RankModule {
 	'use strict';
 
@@ -34,11 +37,29 @@ export module RankModule {
 	}
 	export function sortCard(sevenCards: card.CardModule.Card[]): card.CardModule.Card[] {
 		return sevenCards.sort((a, b) => {
-			return (card.CardModule.cardValStrength.indexOf(a.value) - card.CardModule.cardValStrength.indexOf(b.value));
+			return (cardValStrength.indexOf(a.value) - cardValStrength.indexOf(b.value));
 		});
 	}
-	function ifStraight(sevenCards: card.CardModule.Card[]): number[] {
-
+	export function ifStraight(sevenCards: card.CardModule.Card[]): number[] {
+		let numList = sevenCards.map((card) => {
+			return card.value; 
+		});
+		if (numList[0] < 5 && numList[0] != 1) return [];
+		for (let i:number = 0; i < 4; i++){
+			let startIndex: number = cardValStrength.indexOf(numList[i]);
+			if ( startIndex < 10
+				&& numList.indexOf(straightList[startIndex + 1]) != -1 
+				&& numList.indexOf(straightList[startIndex + 2]) != -1
+				&& numList.indexOf(straightList[startIndex + 3]) != -1 
+				&& numList.indexOf(straightList[startIndex + 4]) != -1 
+				) {
+				return [numList[i], 
+								straightList[startIndex + 1], 
+								straightList[startIndex + 2],
+								straightList[startIndex + 3],
+								straightList[startIndex + 4]];
+			}
+		}
 		return [];
 	}
 	// get hand ranking and five best cards

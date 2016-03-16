@@ -26,7 +26,9 @@ export module CardModule {
 		KING = 13
 	}
 
+	export let straightList = [1, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 	export let cardValStrength = [1, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+
 	let cardInit = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
 	let suitInit = ['S', 'H', 'C', 'D'];
 	

@@ -1,4 +1,4 @@
-var deck = require('../../src/util/deck');
+var deck = require('../../src/utiljs/deck');
 
 describe('deck', function () {
     beforeAll(function () {
