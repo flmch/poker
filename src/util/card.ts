@@ -33,10 +33,11 @@ export module CardModule {
 	let suitInit = ['S', 'H', 'C', 'D'];
 	
 	export function strToCard(str: string): Card {
-		let parsed = str.trim().split(',');
-		parsed[0] = parsed[0].trim();
-		parsed[1] = parsed[1].trim();
-		return new Card(suitInit.indexOf(parsed[0]), cardInit.indexOf(parsed[1]));
+		// let parsed = str.trim().split(',');
+		// parsed[0] = parsed[0].trim();
+		// parsed[1] = parsed[1].trim();
+		str = str.trim();
+		return new Card(suitInit.indexOf(str[0]), cardInit.indexOf(str[1]));
 	}
 
 	export function toCardArr(strArr: string[]): Card[] {

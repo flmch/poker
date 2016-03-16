@@ -30,6 +30,7 @@
     "karma-browserify": "^5.0.2",
     "karma-chrome-launcher": "^0.2.2",
     "karma-jasmine": "^0.3.7",
+    "karma-sourcemap-loader": "^0.3.7",
     "tsd": "^0.6.5",
     "tslint": "^3.4.0",
     "typescript": "^1.7.5",
