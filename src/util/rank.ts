@@ -25,7 +25,7 @@ export module RankModule {
 		FOUR_OF_A_KIND,
 		FULL_HOUSE,
 		FLUSH,
-		STARIGHT,
+		STRAIGHT,
 		THREE_OF_A_KIND,
 		TWO_PAIRS,
 		ONE_PAIR,
@@ -89,16 +89,14 @@ export module RankModule {
 		}
 		for (let i = 0; i < 4; i++){
 			if( counter[i] >= 5 ){
-				let maxSuit = i;
 				return cards.filter((card) => {
-					return card.suit == maxSuit;
+					return card.suit == i;
 				})
 			}
 		}
 		return [];
 	}
-	export function isStarightFlush(cards: card.CardModule.Card[]): HandOutput {
-		let suits: card.CardModule.Card[] = checkFlush(cards);
+	function isStraightFlush(cards: card.CardModule.Card[], suits: card.CardModule.Card[]): HandOutput {
 		if (suits.length == 0) return { cards: [] };
 		let numList: number[] = checkStraight(suits);
 		if (numList.length == 0) return { cards: [], flush: suits };
@@ -109,56 +107,32 @@ export module RankModule {
 			cards: cards,
 			category: 0,
 			ranker: [numList[0]],
-			flush: suits
+			flush: suits // flush information can be reused if the hand is not straight flush
 		}
 	}
-	export function isFourOfKind(cards: card.CardModule.Card[], numCounter: number[]): HandOutput {
-		// this line of cards length checking will be removed in future.
-		// length checking should be done by parent function.
-		// defined here only for testing purpose
-		if (cards.length < 5) return { cards: [] };
-		let counter: number[];
+	function isFourOfKind(cards: card.CardModule.Card[], counter: number[]): HandOutput {
 		let maxCount: number = 0;
 		let maxNum: number = -1;
 
-		// ------------------ need to be reviesd in the future ------------------
-		// counter array should be defined in getRank function.
-		// is**** function should not recalculate counter array.
-		// Counter defined here only for testing purpose
-		if( numCounter === undefined ){
-			counter = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-			cards.forEach((card, index) => {
-				counter[card.value]++;
-				maxCount = Math.max(counter[card.value], maxCount);
-				if( counter[card.value] == 4 ) {
-					maxNum = card.value;
-				}
-			});			
-		}else{
-			counter = numCounter;
-			maxCount = counter.reduce((preVal, curVal) => { 
-				if (curVal > counter[preVal] ) {
-					counter[curVal];
-				}else{
-					return counter.indexOf(preVal);
-				}
-			}, 0);
+		for (let i = 1; i < counter.length; i++){
+			if( maxCount < counter[i] ){
+				maxCount = counter[i];
+				maxNum = i;
+			}
 		}
-		// ----------------------------------------------------------------------
 
 		// try to find number that appears most, otherwise return []
 		if (maxCount < 4) return { cards: [] };
 
 		// if four of a kind exists, get hand output
-		let kicker: number = -1;
-		let kickerNotFound: boolean = true;
-		cards = sortCard(cards);
+		let kickerNum: number = -1;
+		let kickerFound: boolean = false;
 		cards = cards.filter((card) => {
 			if (card.value == maxNum) {
 				return true;
-			} else if (kickerNotFound && card.value != maxNum) {
-				kickerNotFound = false;
-				kicker = card.value;
+			} else if ( card.value != maxNum && !kickerFound ) {
+				kickerFound = true;
+				kickerNum = card.value;
 				return true;
 			}else{
 				return false;
@@ -167,53 +141,196 @@ export module RankModule {
 		return {
 			cards: cards,
 			category: 1,
-			ranker: [maxNum, kicker],
-			numCounter: counter
+			ranker: [maxNum, kickerNum]
 		}
 	}
-	export function isFullHouse(cards: card.CardModule.Card[], numCounter: number[]): HandOutput {
-		let counter: number[];
+	function isFullHouse(cards: card.CardModule.Card[], counter: number[]): HandOutput {
 		let maxNum: number = -1;
-		let kicker: number = -1;
+		let kickerNum: number = -1;
+		let maxFound: boolean = false;
 		let kickerFound: boolean = false;
-
-		// ------------------ need to be reviesd in the future ------------------
-		// counter array should be defined in getRank function.
-		// is**** function should not recalculate counter array.
-		// Counter defined here only for testing purpose
-		if (numCounter === undefined) {
-			counter = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-			cards.forEach((card, index) => {
-				counter[card.value]++;
-			});
-		} else {
-			counter = numCounter;
-			maxNum = counter.reduce((preVal, curVal) => {
-				if (curVal > counter[preVal]) {
-					counter[curVal];
-				} else {
-					return counter.indexOf(preVal);
-				}
-			}, 0);
-		}
-		// ----------------------------------------------------------------------
+		let kickerAdded: number = 0;
 
 		for (let i = 0; i < cardValStrength.length; i++) {
-			if (counter[cardValStrength[i]] == 3) {
+			if (counter[cardValStrength[i]] == 3 && !maxFound) {
 				maxNum = cardValStrength[i];
-			}
-			if (counter[cardValStrength[i]] == 2 && !kickerFound) {
-				kicker = cardValStrength[i];
+				maxFound = true;
+			}else if (counter[cardValStrength[i]] >= 2 && !kickerFound) {
+				kickerNum = cardValStrength[i];
 				kickerFound = true;
 			}
 		}
-		
-		if (maxNum == -1) return { cards: [] };
-		
+		if (maxNum == -1 || !kickerFound) { return { cards: [] } };
+		cards = cards.filter((card) => {
+			if (card.value == kickerNum) { kickerAdded++; }
+			return card.value == maxNum || (card.value == kickerNum && kickerAdded <= 2);
+		});
+		return {
+			cards: cards,
+			category: 2,
+			ranker: [maxNum, kickerNum]
+		};
+	}
+	function isFlush(suits: card.CardModule.Card[]): HandOutput {
+		if (suits.length == 0) { return { cards: [] }; }
+		suits = suits.slice(0, 5);
+		return {
+			cards: suits,
+			category: 3,
+			ranker: [suits[0].value]
+		}
+	}
+	function isStraight(cards: card.CardModule.Card[]): HandOutput {
+		let numList: number[] = checkStraight(cards);
+		let tracker: number;
+		if (numList.length == 0) { return { cards: [] }; }
+		let ranker: number = numList[0]; 
+		cards = cards.filter((card) => {
+			tracker = numList.indexOf(card.value);
+			if (tracker != -1) {
+				numList.splice(tracker, 1);
+				return true;
+			} else { return false; }
+		});
+		return {
+			cards: cards,
+			category: 4,
+			ranker: [ranker]
+		}
+	}
+	function isThreeOfKind(cards: card.CardModule.Card[], counter: number[]): HandOutput {
+		let maxNum: number = -1;
+		let kickers: number[] = [];
+		let kickerCounter: number = 0;
+
+		for (let i = 1; i < counter.length; i++ ){
+			if( counter[i] == 3 ){
+				maxNum = i;
+			}
+		}
+		if (maxNum == -1) { return { cards: [] };}
+		cards = cards.filter((card) => {
+			if( card.value == maxNum ){
+				return true;
+			} else if (card.value != maxNum && kickerCounter < 2){
+				kickers.push(card.value);
+				kickerCounter++;
+				return true;
+			} else {
+				return false;
+			}
+		});
+		return {
+			cards: cards,
+			category: 5,
+			ranker: [maxNum].concat(kickers)
+		};
+	}
+	function isPairs(cards: card.CardModule.Card[], counter: number[]): HandOutput {
+		let pairs: number[] = [];
+		let kickers: number[] = [];
+		let kickerCounter: number = 0;
+		for (let i = 0; i < cardValStrength.length; i++){
+			if (counter[cardValStrength[i]] == 2 && pairs.length < 2) {
+				pairs.push(cardValStrength[i]);
+			}
+		}
+		if( pairs.length == 2 ){
+			cards = cards.filter((card) => {
+				if( card.value == pairs[0] || card.value == pairs[1] ){
+					return true;
+				} else if (card.value != pairs[0] && card.value != pairs[1] && kickerCounter < 1){
+					kickerCounter++;
+					kickers.push(card.value);
+					return true;
+				} else {
+					return false;
+				}
+			});
+			return {
+				cards: cards,
+				category: 6,
+				ranker: pairs.concat(kickers)
+			};
+		}else if(pairs.length == 1){
+			cards = cards.filter((card) => {
+				if (card.value == pairs[0]) {
+					return true;
+				} else if (card.value != pairs[0] && kickerCounter < 3) {
+					kickerCounter++;
+					kickers.push(card.value);
+					return true;
+				} else {
+					return false;
+				}
+			});
+			return {
+				cards: cards,
+				category: 7,
+				ranker: pairs.concat(kickers)
+			};			
+		}else{
+			cards = cards.slice(0, 5);
+			return {
+				cards: cards,
+				category: 8,
+				ranker: cards.map((card) => { return card.value;})
+			}
+		}
 	}
 	// get hand ranking and five best cards
-	export function getRank(player: player.PlayerModule.Player, board: game.gameModule.Board) {
-		let sevenCards: card.CardModule.Card[] = getSevenCard(player, board);
+	export function rankHand(cards: card.CardModule.Card[], player: player.PlayerModule.Player, board: game.gameModule.Board): HandOutput {
+		// ----------- this part will be revised.
+		// argument 'cards' is only defined for testing
+		let sevenCards: card.CardModule.Card[];
+		if( cards != undefined ){
+			sevenCards = cards;
+		}else{
+			sevenCards = getSevenCard(player, board);
+		}
+		//////////////////////////////////////////////////////
 
+		// ---------------- setup & configuration ----------
+		// sevenCards must have seven cards
+		if (sevenCards.length < 7) return { cards: [] };
+
+		// sort cards
+		sortCard(cards);
+
+		// create number counter array. Length is 13+1
+		let counter: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		sevenCards.forEach((card) => { counter[card.value]++; });
+
+		// run checkFlush and store the result
+		let suits = checkFlush(cards);
+
+		// ***********************  start ranking *********************
+		let output: HandOutput;
+		// ----------------- check straight flush --------------------
+		output = isStraightFlush(sevenCards, suits);
+		if (output.category == 0) { return output; }
+
+		// ----------------- check Four of A Kind --------------------
+		output = isFourOfKind(sevenCards, counter);
+		if (output.category == 1) { return output; }
+
+		// ----------------- check FullHouse --------------------
+		output = isFullHouse(sevenCards, counter);
+		if (output.category == 2) { return output; }
+
+		// ----------------- check flush ----------------------------
+		output = isFlush(suits);
+		if (output.category == 3) { return output; }
+
+		// ----------------- check straight -------------------------
+		output = isStraight(cards);
+		if (output.category == 4) { return output; }
+
+		// ----------------- check Three of A Kind ------------------
+		output = isThreeOfKind(cards, counter);
+		if (output.category == 5) { return output; }
+
+		// ----------------- check Two Pair, One Pair and High Card --
+		return isPairs(cards, counter);
 	}
 }
