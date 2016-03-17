@@ -175,6 +175,7 @@ export module RankModule {
 		let counter: number[];
 		let maxNum: number = -1;
 		let kicker: number = -1;
+		let kickerFound: boolean = false;
 
 		// ------------------ need to be reviesd in the future ------------------
 		// counter array should be defined in getRank function.
@@ -195,11 +196,20 @@ export module RankModule {
 				}
 			}, 0);
 		}
-
-		for (let i = 1; i < counter.length; i++) {
-			// if(  )
-		}
 		// ----------------------------------------------------------------------
+
+		for (let i = 0; i < cardValStrength.length; i++) {
+			if (counter[cardValStrength[i]] == 3) {
+				maxNum = cardValStrength[i];
+			}
+			if (counter[cardValStrength[i]] == 2 && !kickerFound) {
+				kicker = cardValStrength[i];
+				kickerFound = true;
+			}
+		}
+		
+		if (maxNum == -1) return { cards: [] };
+		
 	}
 	// get hand ranking and five best cards
 	export function getRank(player: player.PlayerModule.Player, board: game.gameModule.Board) {
