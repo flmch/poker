@@ -10,12 +10,13 @@ export module PlayerModule {
 	// 	card2: card.CardModule.Card;
 	// }
 	export class Player {
-		public id: number;
+		private id: number;
 		private name: string;
 		private hand: card.CardModule.Card[];
-		public handRank: rank.RankModule.HandOutput;
+		private handRank: rank.RankModule.HandOutput;
 		private stack: number = 0;
 		private betThisRound: number = 0;
+		public ifFold: boolean = true;
 		constructor(id: number, name: string, stack: number, hand?: card.CardModule.Card[]) {
 			this.id = id;
 			this.name = name;
@@ -26,6 +27,9 @@ export module PlayerModule {
 			if (hand.length == 2 && hand[0] instanceof card.CardModule.Card) {
 				this.hand = hand;
 			}
+		}
+		public rank(rank: rank.RankModule.HandOutput): void {
+			this.handRank = rank;
 		}
 		public getHand(): card.CardModule.Card[] {
 			return this.hand

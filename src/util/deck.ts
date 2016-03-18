@@ -4,7 +4,7 @@ import card = require('./card');
 
 export module DeckModule {
 	export class Deck {
-		all: card.CardModule.Card[];
+		private all: card.CardModule.Card[];
 		constructor() {
 			this.newDeck();
 		 	this.shuffle();
@@ -28,7 +28,7 @@ export module DeckModule {
 				this.all[index] = temp;
 			}
 		}
-		dealHand(): card.CardModule.Card[] {
+		hand(): card.CardModule.Card[] {
 			let card1: card.CardModule.Card = this.all.pop();
 			let card2: card.CardModule.Card = this.all.pop();
 			return [ card1, card2 ];

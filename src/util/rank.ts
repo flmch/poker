@@ -355,7 +355,7 @@ export module RankModule {
 	export function rankPlayers(board: game.GameModule.Board, players: player.PlayerModule.Player[]): any[] {
 		// deep copy players to avoid making unexpected change to original object
 		let playersCopy = players.map((p) => { 
-			p.handRank = rankHand(board, p);
+			p.rank(rankHand(board, p));
 			return p; 
 		});
 		// result will be any 2d array containning players id in order
@@ -394,7 +394,7 @@ export module RankModule {
 		// [[1],[3,7],[6]]
 		result = result.map((ele) => {
 			return ele.map((p) => { 
-				return p.id;
+				return p.getId();
 			});
 		});
 		return result;
