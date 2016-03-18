@@ -1,6 +1,6 @@
 var deck = require('../../src/utiljs/deck');
 
-describe('deck', function () {
+xdescribe('deck', function () {
     beforeAll(function () {
         this.testDeck = new deck.DeckModule.Deck();
     });

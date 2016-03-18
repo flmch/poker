@@ -1,12 +1,15 @@
-
 var testCard = require('../../src/utiljs/card');
 var testRank = require('../../src/utiljs/rank');
+var testPlayer = require('../../src/utiljs/player');
+var testGame = require('../../src/utiljs/game');
 
 var CardModule = testCard.CardModule;
 var RankModule = testRank.RankModule;
+var PlayerModule = testPlayer.PlayerModule;
+var GameModule = testGame.GameModule;
 var toCardArr = CardModule.toCardArr;
 
-describe('rank', function(){
+xdescribe('rankHand', function(){
 	beforeAll(function(){
 		this.rankHand = RankModule.rankHand;
 	});
@@ -242,5 +245,5 @@ describe('rank', function(){
 		expect( output.category ).toBe(8);
 		expect( JSON.stringify(output.cards) ).toBe( JSON.stringify(target) );
 		expect( JSON.stringify(output.ranker) ).toBe( JSON.stringify([1,13,12,9,7]) );										
-	});			
+	});
 })

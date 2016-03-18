@@ -32,7 +32,7 @@ export module RankModule {
 		HIGH_CARD
 	}
 
-	interface HandOutput {
+	export interface HandOutput {
 		cards: card.CardModule.Card[];
 		category?: number;
 		ranker?: number[];
@@ -40,8 +40,8 @@ export module RankModule {
 		numCounter?: number[];
 	}
 
-	function getSevenCard(player: player.PlayerModule.Player, board: game.gameModule.Board): card.CardModule.Card[] {
-		return player.hand.concat(board.flop).concat(board.turn).concat(board.river);
+	function getSevenCard(player: player.PlayerModule.Player, board: game.GameModule.Board): card.CardModule.Card[] {
+		return player.getHand().concat(board.flop).concat(board.turn).concat(board.river);
 	}
 	export function sortCard(cards: card.CardModule.Card[]): card.CardModule.Card[] {
 		return cards.sort((a, b) => {
@@ -279,15 +279,16 @@ export module RankModule {
 		}
 	}
 	// get hand ranking and five best cards
-	export function rankHand(cards: card.CardModule.Card[], player: player.PlayerModule.Player, board: game.gameModule.Board): HandOutput {
+	export function rankHand(board: game.GameModule.Board, player: player.PlayerModule.Player): HandOutput {
 		// ----------- this part will be revised.
 		// argument 'cards' is only defined for testing
 		let sevenCards: card.CardModule.Card[];
-		if( cards != undefined ){
-			sevenCards = cards;
+		if( arguments.length == 1 ){ // arguments length equals to one only happens for testing case
+			sevenCards = arguments[0];
 		}else{
 			sevenCards = getSevenCard(player, board);
 		}
+
 		//////////////////////////////////////////////////////
 
 		// ---------------- setup & configuration ----------
@@ -295,14 +296,14 @@ export module RankModule {
 		if (sevenCards.length < 7) return { cards: [] };
 
 		// sort cards
-		sortCard(cards);
+		sortCard(sevenCards);
 
 		// create number counter array. Length is 13+1
 		let counter: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		sevenCards.forEach((card) => { counter[card.value]++; });
 
 		// run checkFlush and store the result
-		let suits = checkFlush(cards);
+		let suits = checkFlush(sevenCards);
 
 		// ***********************  start ranking *********************
 		let output: HandOutput;
@@ -323,14 +324,79 @@ export module RankModule {
 		if (output.category == 3) { return output; }
 
 		// ----------------- check straight -------------------------
-		output = isStraight(cards);
+		output = isStraight(sevenCards);
 		if (output.category == 4) { return output; }
 
 		// ----------------- check Three of A Kind ------------------
-		output = isThreeOfKind(cards, counter);
+		output = isThreeOfKind(sevenCards, counter);
 		if (output.category == 5) { return output; }
 
 		// ----------------- check Two Pair, One Pair and High Card --
-		return isPairs(cards, counter);
+		return isPairs(sevenCards, counter);
+	}
+	export function compareTwoP(board: game.GameModule.Board, player1: player.PlayerModule.Player, player2: player.PlayerModule.Player): number {
+		let h1: HandOutput = rankHand(board, player1);
+		let h2: HandOutput = rankHand(board, player2);
+		if( h1.category < h2.category ){
+			return -1;
+		} else if (h1.category > h2.category){
+			return 1;
+		}else{
+			for (let i = 0; i < h1.ranker.length; i++){
+				if (cardValStrength.indexOf(h1.ranker[i]) < cardValStrength.indexOf(h2.ranker[i])) {
+					return -1;
+				} else if (cardValStrength.indexOf(h1.ranker[i]) > cardValStrength.indexOf(h2.ranker[i])) {
+					return 1;
+				}
+			}
+			return 0;
+		}
+	}
+	export function rankPlayers(board: game.GameModule.Board, players: player.PlayerModule.Player[]): any[] {
+		// deep copy players to avoid making unexpected change to original object
+		let playersCopy = players.map((p) => { 
+			p.handRank = rankHand(board, p);
+			return p; 
+		});
+		// result will be any 2d array containning players id in order
+		// if two players rank exactly the same, they will be put in one level in same array
+		// example: [[1st], [2nd], [3rd, 3rd], [4th]]
+		let result: any[] = [];
+
+		// sort players according to their rankings
+		// result will be an 1d array with player elements
+		// [p1,p3,p7,p6]
+		playersCopy.sort((a,b) => {
+			// console.log(a);
+			// console.log(b);
+			// console.log(compareTwoP(board, a, b));
+			return compareTwoP(board, a, b);
+		});
+
+		// console.log(playersCopy);
+		// create sorted 2d array with player elements according to ranking
+		// [[p1],[p3, p7], [p6]]
+		playersCopy.forEach((p) => {
+			if(result.length == 0){
+				let temp: player.PlayerModule.Player[] = [];
+				temp.push(p);
+				result.push(temp);
+			} else if ( compareTwoP(board, p, result[result.length - 1][0]) == 0 ){
+				result[result.length - 1].push(p);
+			} else{
+				let temp: player.PlayerModule.Player[] = [];
+				temp.push(p);
+				result.push(temp);				
+			}
+		});
+
+		// map 2d array in player objects to 2d array in player id
+		// [[1],[3,7],[6]]
+		result = result.map((ele) => {
+			return ele.map((p) => { 
+				return p.id;
+			});
+		});
+		return result;
 	}
 }

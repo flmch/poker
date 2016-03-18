@@ -2,7 +2,7 @@
 var testCard = require('../../src/utiljs/card');
 var testRank = require('../../src/utiljs/rank');
 
-describe('card', function(){
+xdescribe('card', function(){
 	it('should return correct card based on input string', function(){
 		expect( JSON.stringify(testCard.CardModule.strToCard('SA')) ).toBe( JSON.stringify({suit:0, value:1}) );
 		expect( JSON.stringify(testCard.CardModule.strToCard('HA')) ).toBe( JSON.stringify({suit:1, value:1}) );
