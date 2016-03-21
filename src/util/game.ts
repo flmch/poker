@@ -24,24 +24,46 @@ export module GameModule {
 			this.deck = new deck.DeckModule.Deck();
 			this.players = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
 		}
+
+		// ----------------- methods for board -----------------
 		getBoard(): Board {
 			return this.board;
 		}
-		dealFlop(): void { this.board.flop = this.deck.flop(); }
-		dealTurn(): void { this.board.turn = this.deck.turn(); }
-		dealRiver(): void { this.board.river = this.deck.river(); }
 		addPlayer(id: number, name: string, stack: number): void {
 			this.players[id] = new player.PlayerModule.Player(id, name, stack);
+		}		
+		dealFlop(): void { 
+			this.deck.burnCard();
+			this.board.flop = this.deck.flop(); 
 		}
-		dealHand(id: number, hand: card.CardModule.Card[]): void {
+		dealTurn(): void {
+			this.deck.burnCard();
+			this.board.turn = this.deck.turn(); 
+		}
+		dealRiver(): void {
+			this.deck.burnCard();
+			this.board.river = this.deck.river(); 
+		}
+
+		// ----------------- methods for players -----------------
+		dealHand(id: number, hand?: card.CardModule.Card[]): void {
 			if( hand == undefined ){
 				hand = this.deck.hand();
 			}
 			this.players[id].assignHand(hand);
 		}
+		dealAll(): void {
+			this.players.forEach((p, index) => {
+				if (p instanceof player.PlayerModule.Player){
+					this.dealHand(index);
+				} 
+			});
+		}
 		bet(id: number, amount: number): void {
 			this.playersBet[id] += amount;
 		}
+
+		// ----------------- methods for pot -----------------
 		getPotSum(): number {
 			return this.playersBet.reduce((preVal, curVal) => {
 				return preVal + curVal;
@@ -63,7 +85,6 @@ export module GameModule {
 			// more than one player left
 			}else{ 
 				let rankResult: any[] = rank.RankModule.rankPlayers(this.board, activePlayers);
-				console.log(rankResult);
 				// for each level of ranking, sort players accoridng to their bet
 				for (let i = 0; i < rankResult.length; i++) {
 					rankResult[i].sort((a,b) => {

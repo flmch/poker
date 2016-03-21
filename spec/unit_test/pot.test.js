@@ -95,7 +95,7 @@ describe('split pot', function(){
 		var target = [100,90,80,70,60,50,40,30,20,10];
 		expect(JSON.stringify(output)).toBe(JSON.stringify(target));
 	});
-	it('should split the pot correctly test 3', function(){
+	it('should split the pot correctly test 4', function(){
 		this.g.players[0].assignHand(toCardArr(['D8','D9']));
 		this.g.players[1].assignHand(toCardArr(['D4','D3']));
 		this.g.players[2].assignHand(toCardArr(['H5','S2']));
@@ -121,5 +121,29 @@ describe('split pot', function(){
 		var output = this.g.splitPot();
 		var target = [550,0,0,0,0,0,0,0,0,0];
 		expect(JSON.stringify(output)).toBe(JSON.stringify(target));
-	});	
+	});
+	it('should split the pot correctly test 5', function(){
+		this.g.players[0].assignHand(toCardArr(['SA','H3']));
+		this.g.players[1].assignHand(toCardArr(['DA','H4']));
+		this.g.players[8].assignHand(toCardArr(['DK','C4']));
+		this.g.players[0].ifFold = false;
+		this.g.players[1].ifFold = false;
+		this.g.players[8].ifFold = false;
+		this.g.board = { flop: toCardArr(['C9','H8','H7']), turn: toCardArr(['C8']), river: toCardArr(['H2']) };
+		this.g.playersBet = [30,50,0,1,2,40,0,0,80,0];
+		var output = this.g.splitPot();
+		var target = [61,112,0,0,0,0,0,0,30,0];
+		expect(JSON.stringify(output)).toBe(JSON.stringify(target));
+	});
+	it('should split the pot correctly test 5', function(){
+		this.g.players[0].assignHand(toCardArr(['SA','H3']));
+		this.g.players[1].assignHand(toCardArr(['DA','H4']));
+		this.g.players[0].ifFold = false;
+		this.g.players[1].ifFold = false;
+		this.g.board = { flop: toCardArr(['C9','H8','H7']), turn: toCardArr(['C8']), river: toCardArr(['H2']) };
+		this.g.playersBet = [1,2,0,0,0,0,0,0,0,0];
+		var output = this.g.splitPot();
+		var target = [1,2,0,0,0,0,0,0,0,0];
+		expect(JSON.stringify(output)).toBe(JSON.stringify(target));
+	});
 })
