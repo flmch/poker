@@ -2,3 +2,5 @@ node_modules/
 src/typings
 src/utiljs
 server.js
+public/css
+public/js

@@ -21,11 +21,10 @@ var Server        = require('karma').Server;
 // to compile the whole libarary, use empty string ''
 // define input and output path
 var src = {
-	module
-	// 'script'  : './src/js/**/*.ts',
+	'script'  : './src/app/**/*.ts',
 	// 'scriptNM': './src/js/**/*.!(module).ts',
 	// 'scriptM' : './src/js/**/*.module.ts',
-	// 'style'   : './src/css/**/*.scss',
+	'style'   : './src/app/app.scss'
 	// 'html'		: './public/**/*.html'
 	// 'template' : './public/template/*'
 }
@@ -35,13 +34,11 @@ var des = {
 	'style'	  : './public/css/'
 }
 
-var fileName = 'kmk.js';
-var fileNameMin = 'kmk.min.js';
-
 // ********************** MAIN TASK ************************
 
-gulp.task('default',['ts-module', 'test', 'watch']);
-// gulp.task('default',['ts-lint','build-js', 'build-css', 'browser-sync', 'watch']);
+// gulp.task('default',['ts-module', 'test', 'watch']);
+gulp.task('default',['ts-sever', 'ts-lint','build-js', 'build-css', 'browser-sync', 'watch']);
+// gulp.task('default',['ts-lint','build-js', 'build-css', 'watch']);
 
 // ********************** CHECK ************************
 
@@ -54,12 +51,14 @@ gulp.task('ts-lint',function(){
 
 // watch file change and keep checking
 gulp.task('watch',function(){
-	// gulp.watch(src.script, ['ts-lint', 'build-js']);
-	// gulp.watch(src.style,['build-css']);
-	// gulp.watch([src.html], function(){
-	// 	browserSync.reload();
-	// });
-	gulp.watch(['./src/util/*.ts'], ['ts-module']);
+	gulp.watch(src.script, ['ts-lint', 'build-js']);
+	gulp.watch(src.style,['build-css']);
+	gulp.watch('server.ts',['ts-sever']);
+	gulp.watch(['./public/index.html'], function(){
+		browserSync.reload();
+	});
+	// gulp.watch('./public/index.html', browserSync.reload);	
+	// gulp.watch(['./src/util/*.ts'], ['ts-module']);
 })
 
 // ********************** TS *******************************
@@ -71,6 +70,15 @@ gulp.task('ts-module', function(){
       sourcemap: true			
 		}))
 		.pipe(gulp.dest('./src/utiljs'));
+});
+
+gulp.task('ts-sever', function(){
+	return gulp.src('server.ts')
+		.pipe(tsc({
+      module: "CommonJS",
+      sourcemap: true			
+		}))
+		.pipe(gulp.dest('./'));
 });
 
 // ********************** Karma *******************************
@@ -85,18 +93,18 @@ gulp.task('test', function (done) {
 
 // build javascript file
 gulp.task('build-js', function(){
-	return gulp.src([src.scriptNM, src.scriptM])
+	return gulp.src(src.script)
 		.pipe(sourcemaps.init())
 		.pipe(tsc())		
-		.pipe(concat(fileName))
+		.pipe(concat('poker.js'))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(des.script));
 })
 
 // minify javascript file
 gulp.task('minify-js', ['build-js'], function(){
-	return gulp.src(des.script+'kmk.js')
-		.pipe(rename('kmk.min.js'))
+	return gulp.src(des.script+'poker.js')
+		.pipe(rename('poker.min.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest(des.script))
 })
@@ -108,15 +116,15 @@ gulp.task('build-css',function(){
 	return gulp.src(src.style)
 		.pipe(sourcemaps.init())
 		.pipe(sass())
-		.pipe(concat('style.css'))
+		.pipe(concat('poker.css'))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(des.style));
 });
 
 // minify css file
 gulp.task('minify-css',['build-css'],function(){
-	return gulp.src(des.style+'style.css')
-		.pipe(rename('style.min.css'))
+	return gulp.src(des.style+'poker.css')
+		.pipe(rename('poker.min.css'))
 		.pipe(minifyCss())
 		.pipe(gulp.dest(des.style))
 })
