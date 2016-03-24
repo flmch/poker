@@ -22,22 +22,27 @@ var Server        = require('karma').Server;
 // define input and output path
 var src = {
 	'script'  : './src/app/**/*.ts',
-	// 'scriptNM': './src/js/**/*.!(module).ts',
-	// 'scriptM' : './src/js/**/*.module.ts',
-	'style'   : './src/app/app.scss'
-	// 'html'		: './public/**/*.html'
-	// 'template' : './public/template/*'
+	'style'   : ['./src/app/app.scss', './src/app/**/*.scss'],
+	'template' : './src/app/**/*.html'
 }
 
 var des = {
 	'script'  : './public/js/',
-	'style'	  : './public/css/'
+	'style'	  : './public/css/',
+	'template' : './public/template'
 }
 
 // ********************** MAIN TASK ************************
 
 // gulp.task('default',['ts-module', 'test', 'watch']);
-gulp.task('default',['ts-sever', 'ts-lint','build-js', 'build-css', 'browser-sync', 'watch']);
+gulp.task('default',[
+	'ts-sever', 
+	'template',
+	'ts-lint',
+	'build-js', 
+	'build-css', 
+	'browser-sync', 
+	'watch']);
 // gulp.task('default',['ts-lint','build-js', 'build-css', 'watch']);
 
 // ********************** CHECK ************************
@@ -51,10 +56,11 @@ gulp.task('ts-lint',function(){
 
 // watch file change and keep checking
 gulp.task('watch',function(){
+	gulp.watch(src.template,['template']);
 	gulp.watch(src.script, ['ts-lint', 'build-js']);
 	gulp.watch(src.style,['build-css']);
 	gulp.watch('server.ts',['ts-sever']);
-	gulp.watch(['./public/index.html'], function(){
+	gulp.watch(['./public/index.html', src.template, src.style], function(){
 		browserSync.reload();
 	});
 	// gulp.watch('./public/index.html', browserSync.reload);	
@@ -89,6 +95,13 @@ gulp.task('test', function (done) {
   }, done).start();
 });
 
+// ********************** Template *******************************
+
+gulp.task('template', function(){
+	return gulp.src(src.template)
+		.pipe(gulp.dest(des.template));
+})
+
 // ********************** JS *******************************
 
 // build javascript file
@@ -96,15 +109,15 @@ gulp.task('build-js', function(){
 	return gulp.src(src.script)
 		.pipe(sourcemaps.init())
 		.pipe(tsc())		
-		.pipe(concat('poker.js'))
+		.pipe(concat('casino.js'))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(des.script));
 })
 
 // minify javascript file
 gulp.task('minify-js', ['build-js'], function(){
-	return gulp.src(des.script+'poker.js')
-		.pipe(rename('poker.min.js'))
+	return gulp.src(des.script+'casino.js')
+		.pipe(rename('casino.min.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest(des.script))
 })
@@ -116,15 +129,15 @@ gulp.task('build-css',function(){
 	return gulp.src(src.style)
 		.pipe(sourcemaps.init())
 		.pipe(sass())
-		.pipe(concat('poker.css'))
+		.pipe(concat('casino.css'))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(des.style));
 });
 
 // minify css file
 gulp.task('minify-css',['build-css'],function(){
-	return gulp.src(des.style+'poker.css')
-		.pipe(rename('poker.min.css'))
+	return gulp.src(des.style+'casino.css')
+		.pipe(rename('casino.min.css'))
 		.pipe(minifyCss())
 		.pipe(gulp.dest(des.style))
 })
