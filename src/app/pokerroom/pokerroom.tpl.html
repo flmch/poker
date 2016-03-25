@@ -1,1 +1,51 @@
-<h1>template goes here</h1>
+<div class="pokerRoomContainer" layout-gt-sm="row" layout-sm="column">
+	<div flex-gt-sm="75" flex-sm class="tableWrap">
+		<img ng-src="images/table_Foreground_2.png">
+	</div>
+	<div flex-gt-sm="25" flex-sm class="controlWrap">
+		<div layout-gt-sm="column">
+		  <md-toolbar class="md-theme-light" flex-gt-sm>
+		    <h2 class="md-toolbar-tools">
+		      <span>Action</span>
+		    </h2>
+		  </md-toolbar>
+		  <div flex-gt-sm>
+		  	<div layout-gt-sm="row">
+					<md-button class="md-raised" flex-gt-sm="25">Button</md-button>
+			    <md-button class="md-raised md-primary" flex-gt-sm="25">Primary</md-button>
+			    <md-button ng-disabled="true" class="md-raised md-primary" flex-gt-sm="25">Disabled</md-button>
+			    <md-button class="md-raised md-warn" flex-gt-sm="25">Warn</md-button>				  		
+		  	</div> 	
+		  </div>
+
+
+	    <md-slider-container flex-gt-sm>
+	      <span>R</span>
+	      <md-slider flex min="0" max="255" ng-model="color.red" aria-label="red" id="red-slider">
+	      </md-slider>
+	      <md-input-container>
+	        <input flex type="number" ng-model="color.red" aria-label="red" aria-controls="red-slider">
+	      </md-input-container>
+	    </md-slider-container>
+
+<!-- 		  <md-toolbar class="md-theme-light">
+		    <h2 class="md-toolbar-tools">
+		      <span>Game Control</span>
+		    </h2>
+		  </md-toolbar>
+			<md-button class="md-raised">Button</md-button>
+	    <md-button class="md-raised md-primary">Primary</md-button>
+	    <md-button ng-disabled="true" class="md-raised md-primary">Disabled</md-button>
+	    <md-button class="md-raised md-warn">Warn</md-button>		
+
+
+		  <md-toolbar class="md-theme-light">
+		    <h2 class="md-toolbar-tools">
+		      <span>Chat Room</span>
+		    </h2>
+		  </md-toolbar>		 -->		
+		</div>
+  
+	    
+	</div>
+</div>

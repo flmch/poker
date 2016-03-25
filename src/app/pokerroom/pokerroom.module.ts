@@ -2,6 +2,11 @@
 
 module casino.pokerroom {
 	'use strict';
-	angular.module('casino.pokerroom', ['ui.router'])
+	angular.module('casino.pokerroom', [
+		'ui.router',
+		'ngMaterial',
+		'ngAnimate', 
+		'ngAria'
+		])
 		.config(ConfigurePokerRoom);
 }
